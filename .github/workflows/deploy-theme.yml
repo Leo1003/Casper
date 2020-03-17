@@ -1,0 +1,24 @@
+name: Deploy Theme
+on:
+  push:
+    branches:
+      - master
+jobs:
+  deploy:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+      - run: yarn install
+      - name: 'Build theme'
+        env:
+          NODE_ENV: production
+        run: npx gulp zip
+      - name: 'Deploy theme'
+        run: node .github/workflows/deploy-theme.js
+        env:
+          url: ${{ secrets.GHOST_ADMIN_API_URL }}
+          key: ${{ secrets.GHOST_ADMIN_API_KEY }}
+          file: "dist/libra_casper.zip"
